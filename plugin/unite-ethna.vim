@@ -38,7 +38,7 @@ function! s:GetBackEndPathList(keyword)
         endif
     endfor
 
-    return l:list;
+    return l:list
 endfunction
 
 function! s:IsFrontEnd()
@@ -81,7 +81,7 @@ function! s:GetFronEndPathListFromFrontEnd(keyword)
         endif
     endfor
 
-    return l:list;
+    return l:list
 endfunction
 
 function! s:GetFronEndPathListFromTemplate(keyword)
@@ -110,22 +110,21 @@ function! s:GetFronEndPathListFromTemplate(keyword)
         endif
     endfor
 
-    return l:list;
+    return l:list
 endfunction
 
 function! UniteEthnaGetList()
     let l:keyword = s:IsBackEnd()
     if (l:keyword != '')
-        return call s:GetBackEndPathList(l:keyword)
+        return s:GetBackEndPathList(l:keyword)
     endif
-
     let l:keyword = s:IsFrontEnd()
     if (l:keyword != '')
-        return call s:GetFronEndPathListFromFrontEnd(l:keyword)
+        return s:GetFronEndPathListFromFrontEnd(l:keyword)
     endif
     let l:keyword = s:IsTemplate()
     if (l:keyword != '')
-        return call s:GetFronEndPathListFromTemplate(l:keyword)
+        return s:GetFronEndPathListFromTemplate(l:keyword)
     endif
 endfunction
 
