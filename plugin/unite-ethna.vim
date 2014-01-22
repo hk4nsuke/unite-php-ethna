@@ -8,125 +8,58 @@ let s:keepcpo = &cpo
 set cpo&vim
 " ---------------------------------------------------------------------
 
-let s:backends = ['GenericDao', 'TdGateway', 'Module', 'Cascade/DataFormat', 'Cascade/Gateway']
-let s:frontends = ['act', 'view', 'action']
-let s:templates = ['tpl', 'template/ja_JP']
+""""""""""" sample """""""""""
+"[[{
+"    'src': 'frontend/hoge/bar/ja_JP/\([a-zA-Z_]\)\([a-zA-Z_/]*\).tpl$',
+"    'filter': [ '/\([A-Z]\)', '/\L\1' ],
+"    'dst': 'frontend/hoge/bar/ja_JP/\L\1\E\2.tpl',
+"},{
+"    'src': 'Service/Hoge/Fuga/\([a-zA-Z]\)\([a-zA-Z_/]*\).php$',
+"    'filter': [ '/\([a-z]\)', '/\U\1' ],
+"    'dst': 'Service/Hoge/Fuga/\U\1\E\2.php',
+"}]]
+""""""""""""""""""""""""""""""
+let g:unite_ethna_config = [[{
+\}]]
 
 function! s:FullPath()
     return expand('%:p')
 endfunction
 
-function! s:IsBackEnd()
-    for b in s:backends
-        if (matchstr(s:FullPath(), '/' . b . '/\(.\{-\}/\)\{-\}.\{-\}\.php\?$') != '')
-            return b
-        endif
-    endfor
-    return ''
-endfunction
-
-function! s:GetBackEndPathList(keyword)
-    let l:pre  = substitute(s:FullPath(), '^\(.*\)/' . a:keyword . '/\(\(.\{-\}/\)*.\{-\}\.php\)$', '\1', '')
-    let l:post = substitute(s:FullPath(), '^\(.*\)/' . a:keyword . '/\(\(.\{-\}/\)*.\{-\}\.php\)$', '\2', '')
-
-    let l:list = []
-    for b in s:backends
-        " ファイルが存在する場合 QuickFix Window に追加
-        let l:filename = l:pre . '/' . b . '/' . l:post
-
-        if (glob(l:filename) != '')
-            call add(l:list, {'filename': l:filename})
-        endif
-    endfor
-
-    return l:list
-endfunction
-
-function! s:IsFrontEnd()
-    for f in s:frontends
-        if (matchstr(s:FullPath(), '/' . f . '/\(.\{-\}/\)\{-\}.\{-\}\.php\?$') != '')
-            return f
-        endif
-    endfor
-    return ''
-endfunction
-
-function! s:IsTemplate()
-    for f in s:templates
-        if (matchstr(s:FullPath(), '/' . f . '/\(.\{-\}/\)\{-\}.\{-\}\.tpl$') != '')
-            return f
-        endif
-    endfor
-    return ''
-endfunction
-
-function! s:GetFronEndPathListFromFrontEnd(keyword)
-    let l:pre  = substitute(s:FullPath(), '^\(.*\)/' . a:keyword . '/\(\(.\{-\}/\)*.\{-\}\.php\)$', '\1', '')
-    let l:post = substitute(s:FullPath(), '^\(.*\)/' . a:keyword . '/\(\(.\{-\}/\)*.\{-\}\.php\)$', '\2', '')
-
-    let l:list = []
-    for b in s:frontends
-        " ファイルが存在する場合 QuickFix Window に追加
-        let l:filename = l:pre . '/' . b . '/' . l:post
-        if (glob(l:filename) != '')
-            call add(l:list, {'filename': l:filename})
-        endif
-    endfor
-
-    let l:tpl_post = substitute(l:post, '\(^.*\)\.php\?$', '\L\1.tpl', '')
-    for b in s:templates
-        " ファイルが存在する場合 QuickFix Window に追加
-        let l:filename = l:pre . '/' . b . '/' . l:tpl_post
-        if (glob(l:filename) != '')
-            call add(l:list, {'filename': l:filename})
-        endif
-    endfor
-
-    return l:list
-endfunction
-
-function! s:GetFronEndPathListFromTemplate(keyword)
-    let l:pre  = substitute(s:FullPath(), '^\(.*\)/' . a:keyword . '/\(\(.\{-\}/\)*.\{-\}\.tpl\)$', '\1', '')
-    let l:post = substitute(s:FullPath(), '^\(.*\)/' . a:keyword . '/\(\(.\{-\}/\)*.\{-\}\.tpl\)$', '\2', '')
-
-    let l:list = []
-
-    " todo; php? format に未対応
-    let l:frontend_post = substitute(l:post, '\(^.\)', '\U\1', 'g')
-    let l:frontend_post = substitute(l:frontend_post, '/\(.\)', '/\U\1', 'g')
-    let l:frontend_post = substitute(l:frontend_post, '\.tpl$', '.php', '')
-    for b in s:frontends
-        " ファイルが存在する場合 QuickFix Window に追加
-        let l:filename = l:pre . '/' . b . '/' . l:frontend_post
-        if (glob(l:filename) != '')
-            call add(l:list, {'filename': l:filename})
-        endif
-    endfor
-
-    for b in s:templates
-        " ファイルが存在する場合 QuickFix Window に追加
-        let l:filename = l:pre . '/' . b . '/' . l:post
-        if (glob(l:filename) != '')
-            call add(l:list, {'filename': l:filename})
-        endif
-    endfor
-
-    return l:list
-endfunction
-
 function! UniteEthnaGetList()
-    let l:keyword = s:IsBackEnd()
-    if (l:keyword != '')
-        return s:GetBackEndPathList(l:keyword)
-    endif
-    let l:keyword = s:IsFrontEnd()
-    if (l:keyword != '')
-        return s:GetFronEndPathListFromFrontEnd(l:keyword)
-    endif
-    let l:keyword = s:IsTemplate()
-    if (l:keyword != '')
-        return s:GetFronEndPathListFromTemplate(l:keyword)
-    endif
+    let l:path = s:FullPath()
+    for s:group in g:unite_ethna_config
+        for s:c in s:group
+            if (matchstr(l:path, s:c['src']) != '')
+                let l:pre  = substitute(l:path, '\(^.*/\)' . s:c['src'], '\1', '')
+
+                let l:index = 1
+                let l:text = ''
+                let l:pattern = ''
+                while 1
+                    let l:word = substitute(l:path, '^.*/' . s:c['src'], '\' . l:index, '')
+                    if (l:word == '')
+                        break
+                    endif
+                    let l:text = l:text . l:word
+                    let l:pattern = l:pattern . '\(' . l:word . '\)'
+                    let l:index = l:index + 1
+                endwhile
+
+                let l:list = []
+                for s:dc in s:group
+                    let l:filtered_pattern = substitute(l:pattern, s:dc['filter'][0], s:dc['filter'][1], 'g')
+                    let l:dst = l:pre . substitute(l:text, l:filtered_pattern, s:dc['dst'], '')
+
+                    if (glob(l:dst) != '')
+                        call add(l:list, {'filename': l:dst})
+                    endif
+                endfor
+
+                return l:list
+            endif
+        endfor
+    endfor
 endfunction
 
 " ---------------------------------------------------------------------
