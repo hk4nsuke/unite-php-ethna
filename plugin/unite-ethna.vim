@@ -19,8 +19,8 @@ set cpo&vim
 "    'dst': 'Service/Hoge/Fuga/\U\1\E\2.php',
 "}]]
 """"""""""""""""""""""""""""""
-let g:unite_ethna_config = [[{
-\}]]
+"let g:unite_ethna_config = [[{
+"\}]]
 
 function! s:FullPath()
     return expand('%:p')
