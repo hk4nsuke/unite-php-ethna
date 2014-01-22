@@ -8,9 +8,9 @@ let s:keepcpo = &cpo
 set cpo&vim
 " ---------------------------------------------------------------------
 
-let s:backends = ['GenericDao', 'TdGateway', 'Module']
-let s:frontends = ['act', 'view']
-let s:templates = ['tpl']
+let s:backends = ['GenericDao', 'TdGateway', 'Module', 'Cascade/DataFormat', 'Cascade/Gateway']
+let s:frontends = ['act', 'view', 'action']
+let s:templates = ['tpl', 'template/ja_JP']
 
 function! s:FullPath()
     return expand('%:p')
@@ -33,6 +33,7 @@ function! s:GetBackEndPathList(keyword)
     for b in s:backends
         " ファイルが存在する場合 QuickFix Window に追加
         let l:filename = l:pre . '/' . b . '/' . l:post
+
         if (glob(l:filename) != '')
             call add(l:list, {'filename': l:filename})
         endif
