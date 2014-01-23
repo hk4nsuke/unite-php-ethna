@@ -34,22 +34,26 @@ function! UniteEthnaGetList()
                 let l:pre  = substitute(l:path, '\(^.*/\)' . s:c['src'], '\1', '')
 
                 let l:index = 1
-                let l:text = ''
-                let l:pattern = ''
+                let l:patterns = []
                 while 1
                     let l:word = substitute(l:path, '^.*/' . s:c['src'], '\' . l:index, '')
                     if (l:word == '')
                         break
                     endif
-                    let l:text = l:text . l:word
-                    let l:pattern = l:pattern . '\(' . l:word . '\)'
+                    call add(l:patterns, l:word)
                     let l:index = l:index + 1
                 endwhile
 
                 let l:list = []
                 for s:dc in s:group
-                    let l:filtered_pattern = substitute(l:pattern, s:dc['filter'][0], s:dc['filter'][1], 'g')
-                    let l:dst = l:pre . substitute(l:text, l:filtered_pattern, s:dc['dst'], '')
+                    let l:filtered_pattern = ''
+                    let l:base_text = ''
+                    for l:pattern in l:patterns
+                        let l:word = substitute(l:pattern, s:dc['filter'][0], s:dc['filter'][1], 'g')
+                        let l:base_text = l:base_text . l:word
+                        let l:filtered_pattern = l:filtered_pattern . '\(' . l:word . '\)'
+                    endfor
+                    let l:dst = l:pre . substitute(l:base_text, l:filtered_pattern, s:dc['dst'], '')
 
                     if (glob(l:dst) != '')
                         call add(l:list, {'filename': l:dst})
