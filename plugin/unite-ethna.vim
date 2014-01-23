@@ -10,13 +10,13 @@ set cpo&vim
 
 """"""""""" sample """""""""""
 "[[{
-"    'src': 'frontend/hoge/bar/ja_JP/\([a-zA-Z_]\)\([a-zA-Z_/]*\).tpl$',
-"    'filter': [ '/\([A-Z]\)', '/\L\1' ],
-"    'dst': 'frontend/hoge/bar/ja_JP/\L\1\E\2.tpl',
+"    'src': 'frontend/hoge/bar/ja_JP/\([a-zA-Z_/]*\).tpl$',
+"    'filter': [ '\(^[A-Z]\|\/[A-Z]\)', '\L\1' ],
+"    'dst': 'frontend/hoge/bar/ja_JP/\1.tpl',
 "},{
-"    'src': 'Service/Hoge/Fuga/\([a-zA-Z]\)\([a-zA-Z_/]*\).php$',
-"    'filter': [ '/\([a-z]\)', '/\U\1' ],
-"    'dst': 'Service/Hoge/Fuga/\U\1\E\2.php',
+"    'src': 'Service/Hoge/Fuga/\([a-zA-Z_/]*\).php$',
+"    'filter': [ '\(^[a-z]\|\/[a-z]\)', '\U\1' ],
+"    'dst': 'Service/Hoge/Fuga/\1.php',
 "}]]
 """"""""""""""""""""""""""""""
 "let g:unite_ethna_config = [[{
